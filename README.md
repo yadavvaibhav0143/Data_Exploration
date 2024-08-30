@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-- [Project Overview](project-overview)
-- [Data Sources](data-sources)
-- [Tools](tools)
-- [Key Areas of Exploration](key-areas-of-exploration)
+- [Overview](overview)
+- [Objectives](objectives)
+- [Data Source](data-source)
+- [SQL Queries & Analysis](sql-queries-&-analysis)
+- [Tools & Technologies](tools-&-technologies)
 - [Project Structure](project-structure)
-- [Expected Outcome](expected-outcome)
 
 ### Overview
 
@@ -55,10 +55,16 @@ Analysis of hospitalization and ICU admissions related to COVID-19.
 - `SQL Server`: For data management, querying, and analysis.
 - `GitHub Page`': For project hosting and documentation.
 
+### Project Structure
+
+#### DataExploration.Covid: 
+
+The main SQL file containing all the queries used for data exploration and analysis.
+
 ```bash
 git clone https://github.com/yadavvaibhav0143/Covid19-Data-Exploration.git
 ```
 
-### Expected Outcome: 
+#### README.md:
 
-The project aims to provide a comprehensive understanding of the COVID-19 pandemic's impact across different regions, identifying key factors infection rates, mortality, and vaccination effectiveness.
+Project documentation and overview.
