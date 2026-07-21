@@ -1,88 +1,170 @@
+-- ====================================================================================
+-- Query 1: Total Cases vs Total Deaths (Case Fatality Rate)
+-- Purpose: Calculate the percentage of confirmed COVID-19 cases that resulted in death.
+-- ====================================================================================
+SELECT
+    Location,
+    Date,
+    Total_Cases,
+    Total_Deaths,
+    ROUND((Total_Deaths * 100.0) / NULLIF(Total_Cases, 0), 2) AS Death_Percentage
+FROM [Portfolio Project].dbo.CovidDeaths
+WHERE Continent IS NOT NULL
+    AND Total_Cases > 0
+ORDER BY Location, Date;
 
+-- ==============================================
+-- Query 2: Top 5 Countries by Case Fatality Rate
+-- ==============================================
+SELECT TOP 5
+    Location,
+    MAX(total_cases) AS Total_Confirmed_Cases,
+    MAX(total_deaths) AS Total_Deaths,
+    ROUND(
+        MAX(total_deaths) * 100.0 /
+        NULLIF(MAX(total_cases),0),2
+    ) AS Case_Fatality_Rate
+FROM dbo.CovidDeaths
+WHERE continent IS NOT NULL
+GROUP BY Location
+HAVING MAX(total_cases) > 0
+ORDER BY Case_Fatality_Rate DESC;
 
---DBO.CovidDeaths Data
+-- ===============================================
+--Query 3: Highest Infected_Rate as per Population
+-- Purpose: Identify countries with the highest
+-- percentage of their population infected.
+-- ===============================================
+SELECT
+    Location,
+    Population,
+    MAX(Total_Cases) AS Peak_Confirmed_Cases,
+    ROUND(
+        MAX(Total_Cases) * 100.0 /
+        NULLIF(Population, 0),
+        2
+    ) AS Infection_Rate_Percentage
+FROM dbo.CovidDeaths
+WHERE Continent IS NOT NULL
+GROUP BY
+    Location,
+    Population
+ORDER BY Infection_Rate_Percentage DESC;
 
-Select *
-from [Portfolio Project].dbo.CovidDeaths
-where continent is not null
+-- ===============================================
+--Query 4: Continent-wise Case Fatality Rate (CFR)
+-- Purpose:
+-- Calculate continent-level Case Fatality Rate (CFR) by first
+-- identifying the latest cumulative totals for each country,
+-- then aggregating them at the continent level.
+-- ===============================================
+WITH CountryTotals AS
+(
+    SELECT
+        Continent,
+        Location,
+        MAX(Total_Cases) AS Total_Cases,
+        MAX(Total_Deaths) AS Total_Deaths
+    FROM dbo.CovidDeaths
+    WHERE Continent IS NOT NULL
+    GROUP BY
+        Continent,
+        Location
+)
 
+SELECT
+    Continent,
+    SUM(Total_Cases) AS Total_Cases,
+    SUM(Total_Deaths) AS Total_Deaths,
+    ROUND(
+        SUM(Total_Deaths) * 100.0 /
+        NULLIF(SUM(Total_Cases), 0),
+        2
+    ) AS Case_Fatality_Rate
+FROM CountryTotals
+GROUP BY Continent
+ORDER BY Case_Fatality_Rate DESC;
 
---Total_Cases Vs Total_Deaths
-
-select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Deaths_Percent
-from [Portfolio Project].dbo.CovidDeaths
-where total_cases <> '0'  and total_deaths <> '0'
-order by 1,2
-
---Encounter By Location
-
-select Continent, Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Deaths_Percent
-from [Portfolio Project].dbo.CovidDeaths
-where location like '%states%' and total_cases <> '0'  and total_deaths <> '0'
-order by 1,2
-
---Highest Infected_Rate as per Population
-
-select continent, Location, Population, max(total_cases) as HighestInfected_Count, max((total_cases/population))*100 as HighestInfected_Percent
-from [Portfolio Project].dbo.CovidDeaths
-where  total_cases <> '0'  and total_deaths <> '0'
-group by CONTINENT, location, population
-order by HighestInfected_Percent desc
-
---Highest Death_Percentage as per Continent
-
-select continent,  max(total_cases) as TotalCases_Count, max(total_deaths) as TotalDeaths_Count, 
-cast(max((total_deaths/total_cases))*100 as int) as HighestDeath_Percent
-from [Portfolio Project].dbo.CovidDeaths
-where total_cases <> '0'  and total_deaths <> '0'
-group by continent
-order by HighestDeath_Percent desc
-
-
---Total_Population Vs Total_Vaccination
-
+-- =============================================
+--Query 5: Total_Population Vs Total_Vaccination
 --Using CTE
-
-with PopvsVac (Continent, Location, Date, Population, new_vaccinations, VaccinationByLocation)
-as
+-- =============================================
+WITH PopvsVac AS
 (
-Select Dea.continent, Dea.location, dea.date, Dea.population, vac.new_vaccinations,
-sum(cast(Vac.new_vaccinations as int)) over (partition by dea.location order by dea.location) as VaccinationByLocation
-from [Portfolio Project].dbo.CovidDeaths as Dea
-join [Portfolio Project].dbo.CovidVaccination AS Vac
-on Dea.LOCATION = Vac.location 	and
-Dea.date = Vac.date
-where Dea.continent is not null
+    SELECT
+        Dea.continent,
+        Dea.location,
+        Dea.date,
+        Dea.population,
+        Vac.new_vaccinations,
+        SUM(CAST(Vac.new_vaccinations AS BIGINT))
+        OVER (
+            PARTITION BY Dea.location
+            ORDER BY Dea.date
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS VaccinationByLocation
+    FROM dbo.CovidDeaths AS Dea
+    JOIN dbo.CovidVaccination AS Vac
+        ON Dea.location = Vac.location
+       AND Dea.date = Vac.date
+    WHERE Dea.continent IS NOT NULL
 )
-select *
-from PopvsVac
+SELECT *,
+       ROUND((VaccinationByLocation * 100.0) / Population, 2) AS Vaccination_Percentage
+FROM PopvsVac;
 
---Using Temp_Table
+-- ==============================================================
+-- Query 6: Top 5 Countries by Vaccination Coverage
+-- Purpose:
+-- Use a Temporary Table to calculate cumulative vaccinations
+-- and rank countries by vaccination coverage.
+-- ==============================================================
 
-drop table if exists #PercentPopulationVaccinated
-create table #PercentPopulationVaccinated
+DROP TABLE IF EXISTS #VaccinationProgress;
+
+CREATE TABLE #VaccinationProgress
 (
-Continent nvarchar (255),
-Location nvarchar (255),
-Date datetime,
-Population numeric,
-New_Vaccinations numeric,
-VaccinationByLocation numeric
-)
-insert into #PercentPopulationVaccinated	
-Select Dea.continent, dea.location, dea.date, Dea.population, vac.new_vaccinations,
-sum(cast(vac.new_vaccinations as int)) over (partition  by  dea.date, dea.location) as VaccinationByLocation
-from [Portfolio Project].dbo.CovidDeaths as Dea	
-join [Portfolio Project].dbo.CovidVaccination AS Vac
-on Dea.LOCATION = Vac.location 	and
-dea.date = vac.date
-order by 2
+    Continent NVARCHAR(255),
+    Location NVARCHAR(255),
+    Date DATE,
+    Population BIGINT,
+    CumulativeVaccinations BIGINT
+);
 
-select *, (VaccinationByLocation/population)*100 as Vaccination_Percent
-from #PercentPopulationVaccinated
+INSERT INTO #VaccinationProgress
+SELECT
+    dea.continent,
+    dea.location,
+    dea.date,
+    dea.population,
 
+    SUM(CAST(vac.new_vaccinations AS BIGINT))
+    OVER
+    (
+        PARTITION BY dea.location
+        ORDER BY dea.date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS CumulativeVaccinations
 
---Creating View to Store Data for Later
+FROM dbo.CovidDeaths AS dea
+JOIN dbo.CovidVaccination AS vac
+    ON dea.location = vac.location
+   AND dea.date = vac.date
 
-select *
-from #PercentPopulationVaccinated	
+WHERE dea.continent IS NOT NULL;
+
+SELECT TOP 5
+    Location,
+    MAX(Population) AS Population,
+    MAX(CumulativeVaccinations) AS Total_Vaccinations,
+    ROUND(
+        MAX(CumulativeVaccinations) * 100.0 /
+        MAX(Population),
+        2
+    ) AS Vaccination_Percentage
+
+FROM #VaccinationProgress
+
+GROUP BY Location
+
+ORDER BY Vaccination_Percentage DESC;
