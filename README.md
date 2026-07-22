@@ -1,56 +1,78 @@
-# COVID-19 Data Exploration Project
+# COVID-19 Data Analysis using SQL & Tableau
 
-## Table of Contents
+## Project Overview
 
-- [Overview](overview)
-- [Objectives](objectives)
-- [Data Source](data-source)
-- [SQL Queries & Analysis](sql-queries-&-analysis)
-- [Tools & Technologies](tools-&-technologies)
+This project analyzes COVID-19 trends across 10 countries using SQL Server for data analysis and Tableau for interactive visualization. It focuses on understanding infection rates, case fatality rates, vaccination progress, and overall COVID-19 trends through SQL queries and business-oriented dashboards.
 
-### Overview
+## Objectives
 
-This project is a comprehensive data exploration and analysis of the COVID-19 pandemic using SQL Server. The dataset used for this project is sourced from the 'Our World in Data' website, which provides detailed information on COVID-19 cases, vaccination rates, and other relevant metrics across various countries.
+- Analyze COVID-19 cases and deaths over time
+- Compare infection rates across countries
+- Evaluate case fatality rates
+- Track vaccination progress and coverage
+- Build an interactive Tableau dashboard for business insights
 
-### Objectives
+## Tools & Technologies
 
-- To clean and preprocess the raw COVID-19 data for better analysis.
-- To explore trends in COVID-19 cases, vaccination rates, and other critical indicators.
-- To perform SQL queries to gain insights and visualize the pandemic's impact across different regions.
-- To utilize SQL Server for managing, querying, and visualizing large datasets.
+- Microsoft SQL Server
+- Tableau Public
+- Microsoft Excel
 
-### Data Source:
+## Dataset
 
-- COVID-19 cases and deaths
-- Vaccination rates
-- Testing statistics
-- Hospitalizations and ICU admissions
+A curated COVID-19 dataset containing:
+- 10 Countries
+- 80 Records
+- COVID Cases & Deaths
+- Vaccination Data
+- Population & Demographic Indicators
 
-### SQL Queries & Analysis
+## SQL Analysis
 
-#### Case and Death Analysis:
+The project includes SQL queries for:
 
-Queries to analyze the number of cases and deaths globally and by country.
+- Case Fatality Rate Analysis
+- Infection Rate by Population
+- Continent-wise COVID Comparison
+- Vaccination Progress Analysis
+- CTEs
+- Window Functions
+- Temporary Tables
+- Joins
 
-#### Vaccination Trends:
+## Tableau Dashboard
 
-Analysis of vaccination rates and trends over time.
+The dashboard includes:
 
-#### Testing Data:
+- Total Cases KPI
+- Total Deaths KPI
+- Countries Analyzed
+- Latest Reporting Date
+- Cases Trend
+- Vaccination Trend
+- Top Infection Rate
+- Top Case Fatality Rate
+- Top Vaccination Coverage
 
-Insights into testing rates and positivity ratios.
+## Key Insights
 
-#### Regional Comparisons:
+- Infection rates varied significantly across countries.
+- Vaccination coverage increased steadily after early 2021.
+- Case fatality rates differed across regions, indicating varying healthcare outcomes.
+- Interactive dashboards make it easier to compare trends and monitor COVID-19 metrics.
 
-Comparing the pandemic's impact across different countries and regions.
+## Repository Structure
 
-#### Hospitalization Data:
+```
+COVID-19-SQL-Tableau-Project
+│
+├── Dataset
+├── SQL Scripts
+├── Tableau Dashboard
+├── Dashboard Screenshots
+└── README.md
+```
 
-Analysis of hospitalization and ICU admissions related to COVID-19.
+## Author
 
-### Tools & Technologies
-
-- `Excel & SQL`: For initial data cleaning and preprocessing.
-- `SQL Server`: For data management, querying, and analysis.
-- `GitHub Page`': For project hosting and documentation.
-
+**Vaibhav Yadav**
