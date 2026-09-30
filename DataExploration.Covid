@@ -7,7 +7,7 @@ SELECT
     Date,
     Total_Cases,
     Total_Deaths,
-    ROUND((Total_Deaths * 100.0) / NULLIF(Total_Cases, 0), 2) AS Death_Percentage
+    ROUND((Total_Deaths * 100.0) / NULLIF(Total_Cases, 0), 2) AS Case_Fatality_Rate
 FROM [Portfolio Project].dbo.CovidDeaths
 WHERE Continent IS NOT NULL
     AND Total_Cases > 0
@@ -18,7 +18,7 @@ ORDER BY Location, Date;
 -- ==============================================
 SELECT TOP 5
     Location,
-    MAX(total_cases) AS Total_Confirmed_Cases,
+    MAX(total_cases) AS Total_Cases,
     MAX(total_deaths) AS Total_Deaths,
     ROUND(
         MAX(total_deaths) * 100.0 /
@@ -43,20 +43,20 @@ SELECT
         MAX(Total_Cases) * 100.0 /
         NULLIF(Population, 0),
         2
-    ) AS Infection_Rate_Percentage
+    ) AS Confirmed_Cases_Percentage_of_Population
 FROM dbo.CovidDeaths
 WHERE Continent IS NOT NULL
 GROUP BY
     Location,
     Population
-ORDER BY Infection_Rate_Percentage DESC;
+ORDER BY Confirmed_Cases_Percentage_of_Population DESC;
 
 -- ===============================================
 --Query 4: Continent-wise Case Fatality Rate (CFR)
 -- Purpose:
--- Calculate continent-level Case Fatality Rate (CFR) by first
--- identifying the latest cumulative totals for each country,
--- then aggregating them at the continent level.
+-- Calculate continent-level Case Fatality Rate (CFR)
+-- using the maximum cumulative cases and deaths for
+-- each country, then aggregating countries by continent.
 -- ===============================================
 WITH CountryTotals AS
 (
@@ -86,7 +86,7 @@ GROUP BY Continent
 ORDER BY Case_Fatality_Rate DESC;
 
 -- =============================================
---Query 5: Total_Population Vs Total_Vaccination
+--Query 5: Cumulative Vaccination Progress
 --Using CTE
 -- =============================================
 WITH PopvsVac AS
