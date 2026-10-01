@@ -47,12 +47,12 @@ The dashboard includes:
 - Total Cases KPI
 - Total Deaths KPI
 - Countries Analyzed
-- Latest Reporting Date
+- Latest Reporting Date in Dataset
 - Cases Trend
 - Vaccination Trend
-- Top Infection Rate
+- Top Confirmed Cases as % of Population
 - Top Case Fatality Rate
-- Top Vaccination Coverage
+- Actual Vaccination Coverage
 
 ## Key Insights
 
