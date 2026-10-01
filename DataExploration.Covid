@@ -16,18 +16,34 @@ ORDER BY Location, Date;
 -- ==============================================
 -- Query 2: Top 5 Countries by Case Fatality Rate
 -- ==============================================
+
+WITH LatestCountryData AS
+(
+    SELECT
+        Location,
+        Date,
+        Total_Cases,
+        Total_Deaths,
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY Location
+            ORDER BY Date DESC
+        ) AS rn
+    FROM dbo.CovidDeaths
+    WHERE Continent IS NOT NULL
+)
 SELECT TOP 5
     Location,
-    MAX(total_cases) AS Total_Cases,
-    MAX(total_deaths) AS Total_Deaths,
+    Total_Cases,
+    Total_Deaths,
     ROUND(
-        MAX(total_deaths) * 100.0 /
-        NULLIF(MAX(total_cases),0),2
+        Total_Deaths * 100.0 /
+        NULLIF(Total_Cases, 0),
+        2
     ) AS Case_Fatality_Rate
-FROM dbo.CovidDeaths
-WHERE continent IS NOT NULL
-GROUP BY Location
-HAVING MAX(total_cases) > 0
+FROM LatestCountryData
+WHERE rn = 1
+  AND Total_Cases > 0
 ORDER BY Case_Fatality_Rate DESC;
 
 -- ===============================================
@@ -128,7 +144,8 @@ CREATE TABLE #VaccinationProgress
     Location NVARCHAR(255),
     Date DATE,
     Population BIGINT,
-    CumulativeVaccinations BIGINT
+    CumulativeVaccinations BIGINT,
+    People_Fully_Vaccinated BIGINT
 );
 
 INSERT INTO #VaccinationProgress
@@ -144,7 +161,9 @@ SELECT
         PARTITION BY dea.location
         ORDER BY dea.date
         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS CumulativeVaccinations
+    ) AS CumulativeVaccinations,
+
+    CAST(vac.people_fully_vaccinated AS BIGINT) AS People_Fully_Vaccinated
 
 FROM dbo.CovidDeaths AS dea
 JOIN dbo.CovidVaccination AS vac
@@ -158,13 +177,11 @@ SELECT TOP 5
     MAX(Population) AS Population,
     MAX(CumulativeVaccinations) AS Total_Vaccinations,
     ROUND(
-        MAX(CumulativeVaccinations) * 100.0 /
-        MAX(Population),
+        MAX(People_Fully_Vaccinated) * 100.0 /
+        NULLIF(MAX(Population), 0),
         2
     ) AS Vaccination_Percentage
 
 FROM #VaccinationProgress
-
 GROUP BY Location
-
 ORDER BY Vaccination_Percentage DESC;
