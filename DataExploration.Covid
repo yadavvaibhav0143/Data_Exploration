@@ -46,11 +46,11 @@ WHERE rn = 1
   AND Total_Cases > 0
 ORDER BY Case_Fatality_Rate DESC;
 
--- ===============================================
---Query 3: Highest Infected_Rate as per Population
--- Purpose: Identify countries with the highest
--- percentage of their population infected.
--- ===============================================
+-- ================================================================
+--Query 3: Confirmed Cases as % of Population
+-- Purpose: Identify countries with the highest observed confirmed
+-- cases relative to their population.
+-- ================================================================
 SELECT
     Location,
     Population,
@@ -126,7 +126,7 @@ WITH PopvsVac AS
     WHERE Dea.continent IS NOT NULL
 )
 SELECT *,
-       ROUND((VaccinationByLocation * 100.0) / Population, 2) AS Vaccination_Percentage
+       ROUND((VaccinationByLocation * 100.0) / Population, 2) AS Cumulative_Doses_Percentage_of_Population
 FROM PopvsVac;
 
 -- ==============================================================
