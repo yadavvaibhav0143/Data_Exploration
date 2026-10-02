@@ -44,7 +44,7 @@ The project includes SQL queries for:
 
 [🔗 View Interactive Tableau Dashboard](https://public.tableau.com/app/profile/vaibhav.yadav6144/viz/COVID-19GlobalInsightsDashboard_/COVID-19GlobalInsightsDashboard)
 
-![COVID-19 Global Insights Dashboard](Covid-Dash.png)
+![COVID-19 Global Insights Dashboard](Covid-Dash.png)(https://public.tableau.com/app/profile/vaibhav.yadav6144/viz/COVID-19GlobalInsightsDashboard_/COVID-19GlobalInsightsDashboard)
 
 The dashboard includes:
 
