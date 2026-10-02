@@ -42,6 +42,10 @@ The project includes SQL queries for:
 
 ## Tableau Dashboard
 
+[🔗 View Interactive Tableau Dashboard](https://public.tableau.com/app/profile/vaibhav.yadav6144/viz/COVID-19GlobalInsightsDashboard_/COVID-19GlobalInsightsDashboard)
+
+![COVID-19 Global Insights Dashboard](Covid-Dash.png)
+
 The dashboard includes:
 
 - Total Confirmed Cases KPI
